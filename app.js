@@ -4,6 +4,7 @@ const cors = require("cors");
 const viewheadersRouter = require("./routers/viewheaders");
 
 const app = express();
+app.set('trust proxy', true);
 
 const allowlist = [
     "http://localhost:3000",
