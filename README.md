@@ -6,18 +6,21 @@ Live at [https://headers.oboesax.com](https://headers.oboesax.com)
 
 ## Usage
 
-Send a GET request to `/` and receive a JSON response containing your headers and HTTP version:
+Send a GET request to `/` and receive a JSON response containing your client IP, HTTP version, and headers:
 
 ```json
 {
+  "clientIp": "203.0.113.1",
+  "httpVersion": "1.1",
   "headers": {
     "host": "headers.oboesax.com",
     "user-agent": "curl/8.1.2",
     "accept": "*/*"
-  },
-  "httpVersion": "1.1"
+  }
 }
 ```
+
+When accessed from a browser, the page displays your IP address and a formatted, syntax-highlighted JSON view alongside a compact raw JSON view, with copy buttons for both.
 
 ## Setup
 
