@@ -11,25 +11,30 @@ function escapeHtml(str) {
 }
 
 function syntaxHighlight(json) {
-    const escaped = escapeHtml(json);
-    return escaped.replace(
-        /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-        (match) => {
-            let cls = "json-number";
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                    cls = "json-key";
-                } else {
-                    cls = "json-string";
-                }
-            } else if (/true|false/.test(match)) {
-                cls = "json-boolean";
-            } else if (/null/.test(match)) {
-                cls = "json-null";
-            }
-            return `<span class="${cls}">${match}</span>`;
+    const tokenRegex = /("(\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g;
+    let result = '';
+    let lastIndex = 0;
+
+    json.replace(tokenRegex, (match, _p1, _p2, _p3, _p4, offset) => {
+        // Escape and append any text before this match (braces, commas, whitespace)
+        result += escapeHtml(json.slice(lastIndex, offset));
+        lastIndex = offset + match.length;
+
+        let cls = 'json-number';
+        if (/^"/.test(match)) {
+            cls = /:$/.test(match) ? 'json-key' : 'json-string';
+        } else if (/true|false/.test(match)) {
+            cls = 'json-boolean';
+        } else if (/null/.test(match)) {
+            cls = 'json-null';
         }
-    );
+
+        result += `<span class="${cls}">${escapeHtml(match)}</span>`;
+    });
+
+    // Append any remaining text after the last match
+    result += escapeHtml(json.slice(lastIndex));
+    return result;
 }
 
 function generateHTML(data) {
