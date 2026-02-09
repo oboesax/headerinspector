@@ -1,6 +1,20 @@
 const express = require("express");
 const router = new express.Router();
 
+const DEFAULT_PROXY_HEADERS = [
+    'x-forwarded-for',
+    'x-forwarded-proto',
+    'x-forwarded-host',
+    'x-forwarded-port',
+    'x-forwarded-scheme',
+    'x-real-ip',
+    'via',
+];
+
+const PROXY_HEADERS = process.env.STRIP_HEADERS
+    ? process.env.STRIP_HEADERS.split(',').map(h => h.trim().toLowerCase())
+    : DEFAULT_PROXY_HEADERS;
+
 function escapeHtml(str) {
     return str
         .replace(/&/g, "&amp;")
@@ -267,10 +281,15 @@ function generateHTML(data) {
 }
 
 router.get("/", (req, res) => {
+    const headers = { ...req.headers };
+    for (const h of PROXY_HEADERS) {
+        delete headers[h];
+    }
+
     const data = {
         clientIp: req.ip,
         httpVersion: req.httpVersion,
-        headers: req.headers,
+        headers,
     };
 
     if (req.accepts(["json", "html"]) === "html") {
