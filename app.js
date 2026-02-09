@@ -7,9 +7,10 @@ const app = express();
 
 const allowlist = [
     "http://localhost:3000",
-    "http://localhost:3050",
-    "https://headers.oboesax.com",
 ];
+if (process.env.CORS_ORIGINS) {
+    allowlist.push(...process.env.CORS_ORIGINS.split(","));
+}
 const corsOptions = {
   origin: allowlist,
 };
