@@ -39,8 +39,9 @@ function syntaxHighlight(json) {
 
 function generateHTML(data) {
     const prettyJson = JSON.stringify(data, null, 2);
+    const compactJson = JSON.stringify(data);
     const highlighted = syntaxHighlight(prettyJson);
-    const rawJsonEscaped = escapeHtml(prettyJson);
+    const rawJsonEscaped = escapeHtml(compactJson);
 
     return `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
@@ -208,6 +209,7 @@ function generateHTML(data) {
         <div class="section">
             <div class="section-header">
                 <h2>Formatted JSON</h2>
+                <button class="copy-btn" id="copyFormattedBtn">Copy</button>
             </div>
             <pre>${highlighted}</pre>
         </div>
@@ -221,9 +223,11 @@ function generateHTML(data) {
     </div>
     <script>
         (function() {
-            var rawJson = ${JSON.stringify(prettyJson).replace(/</g, '\\u003c')};
+            var rawJson = ${JSON.stringify(compactJson).replace(/</g, '\\u003c')};
+            var prettyJson = ${JSON.stringify(prettyJson).replace(/</g, '\\u003c')};
             var themeToggle = document.getElementById('themeToggle');
             var copyBtn = document.getElementById('copyBtn');
+            var copyFormattedBtn = document.getElementById('copyFormattedBtn');
 
             function setTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
@@ -247,6 +251,13 @@ function generateHTML(data) {
                 navigator.clipboard.writeText(rawJson).then(function() {
                     copyBtn.textContent = 'Copied!';
                     setTimeout(function() { copyBtn.textContent = 'Copy'; }, 2000);
+                });
+            });
+
+            copyFormattedBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(prettyJson).then(function() {
+                    copyFormattedBtn.textContent = 'Copied!';
+                    setTimeout(function() { copyFormattedBtn.textContent = 'Copy'; }, 2000);
                 });
             });
         })();
